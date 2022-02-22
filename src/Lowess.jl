@@ -23,6 +23,10 @@ function fmax(x, y)
     return (x > y ? x : y)
 end
 
+function tupleDiff(p::Tuple{Float64, Float64})
+    return p[2] - p[1]
+end
+
 function lowest(
     x::Vector,
     y::Vector,
@@ -277,8 +281,8 @@ function lowess(
     return ys 
 end 
 
-function  lowess_model(xs, ys, f = 2/3, nsteps = 3, delta = 0.01*Lowess.tupleDiff(extrema(xs)))
-    model = Lowess.lowess(xs, ys, f, nsteps, delta)
+function  lowess_model(xs, ys, f = 2/3, nsteps = 3, delta = 0.01*tupleDiff(extrema(xs)))
+    model = lowess(xs, ys, f, nsteps, delta)
     prediction_model = interpolate(model, BSpline(Constant()))
     prediction_model = scale(prediction_model, range(extrema(xs)[1], stop = extrema(xs)[2], length = length(xs)))    
     return prediction_model
