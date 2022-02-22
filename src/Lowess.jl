@@ -136,13 +136,12 @@ function lowest(
 end 
 
 function lowess(
-    x::Vector{S},
+    x::Vector{T},
     y::Vector{T},
     f = 2/3,
     nsteps::Int64 = 3,
     delta = 0.01*(maximum(x) - minimum(x))
 ) where T <: Real
-
 
     # defining needed variables
     n = length(x)
