@@ -26,7 +26,7 @@ xs = 10 .* rand(100)
 xs = sort(xs)
 ys = sin.(xs) .+ 0.5 * rand(100)
 
-model = loess(xs, ys, 0.2)
+model = lowess(xs, ys, 0.2)
 
 us = range(extrema(xs)...; step = 0.1)
 vs = model(us)
