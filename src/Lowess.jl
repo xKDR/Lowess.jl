@@ -23,7 +23,7 @@ function fmax(x, y)
     return (x > y ? x : y)
 end
 
-function tupleDiff(p::Tuple{Float64, Float64})
+function tupleDiff(p::Tuple{T, T}) where T <: Real
     return p[2] - p[1]
 end
 
