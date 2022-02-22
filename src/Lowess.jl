@@ -283,7 +283,7 @@ end
 
 function  lowess_model(xs, ys, f = 2/3, nsteps = 3, delta = 0.01*tupleDiff(extrema(xs)))
     model = lowess(xs, ys, f, nsteps, delta)
-    prediction_model = interpolate(model, BSpline(Constant()))
+    prediction_model = interpolate(model, BSpline(Linear()))
     prediction_model = scale(prediction_model, range(extrema(xs)[1], stop = extrema(xs)[2], length = length(xs)))    
     return prediction_model
 end
