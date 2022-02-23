@@ -269,10 +269,10 @@ function lowess(
     return ys 
 end 
 
-function  lowess_model(xs, ys, f = 2/3, nsteps = 3, delta = 0.01*(extrema(xs)[2]- extrema(xs)[1]))
+function  lowess_model(xs, ys, f = 2/3, nsteps = 3, delta = 0.01*(maximum(xs) - minimum(xs)))
     model = lowess(xs, ys, f, nsteps, delta)
     prediction_model = interpolate(model, BSpline(Linear()))
-    prediction_model = scale(prediction_model, range(extrema(xs)[1], stop = extrema(xs)[2], length = length(xs)))    
+    prediction_model = scale(prediction_model, range(minimum(xs), stop = maximum(xs), length = length(xs)))    
     return prediction_model
 end
 
