@@ -3,39 +3,27 @@ using Interpolations
 
 export lowess, lowess_model
 
-function min(x::Int64, y::Int64)::Int64
+function min(x::Int, y::Int)::Int
     return ((x < y) ? x : y)
 end
 
-function max(x::Int64, y::Int64)::Int64
+function max(x::Int, y::Int)::Int
     return ((x > y) ? x : y)
-end
-
-function pow2(x)
-    return x*x
-end
-
-function pow3(x)
-    return x*x*x
 end
 
 function fmax(x, y)
     return (x > y ? x : y)
 end
 
-function tupleDiff(p::Tuple{T, T}) where T <: Real
-    return p[2] - p[1]
-end
-
 function lowest(
     x::Vector,
     y::Vector,
-    n::Int64, 
+    n::Int, 
     xs,
     ys::Vector,
-    ys_pos::Int64, 
-    nleft::Int64,
-    nright::Int64,
+    ys_pos::Int, 
+    nleft::Int,
+    nright::Int,
     w::Vector,
     userw::Bool, 
     rw::Vector,
@@ -44,7 +32,7 @@ function lowest(
     b = 0.0
     c = 0.0
     r = 0.0
-    nrt::Int64 = 0
+    nrt::Int = 0
 
     # Julia indexing starts at 1, so add 1 to all indexes
     range = x[n] - x[1]
@@ -54,14 +42,14 @@ function lowest(
 
     # compute weights (pick up all ties on right)
     a = 0.0     # sum of weights
-    j::Int64 = nleft   # initialize j
+    j::Int = nleft   # initialize j
     
     for i in nleft:(n - 1)  # i = j at all times
         w[j + 1] = 0.0
         r = abs(x[j + 1] - xs)      # replaced fabs with abs
         if (r <= h9)       # small enough for non-zero weight
             if (r > h1)
-                w[j + 1] = pow3(1.0 - pow3(r/h))
+                w[j + 1] = (1.0 - (r/h)^3)^3
             else 
                 w[j + 1] = 1.0
             end
@@ -140,12 +128,12 @@ function lowest(
 end 
 
 function lowess(
-    x::Vector{T},
-    y::Vector{T},
+    x::Vector,
+    y::Vector,
     f = 2/3,
-    nsteps::Int64 = 3,
+    nsteps::Int = 3,
     delta = 0.01*(maximum(x) - minimum(x))
-) where T <: Real
+)
 
     # defining needed variables
     n = length(x)
@@ -181,7 +169,7 @@ function lowess(
         return ys
     end 
 
-    ns = max(min(floor(Int64, f*n), n), 2)  # at least two, at most n points
+    ns = max(min(floor(Int, f*n), n), 2)  # at least two, at most n points
     for iter in 1:(nsteps + 1)  # robustness iterations
         nleft = 0
         nright = ns - 1
@@ -274,14 +262,14 @@ function lowess(
             elseif (r > c9) # near 1, avoid underflow
                 rw[i + 1] = 0.0
             else 
-                rw[i + 1] = pow2(1.0 - pow2(r / cmad))
+                rw[i + 1] = (1.0 - (r / cmad)^2)^2
             end
         end 
     end
     return ys 
 end 
 
-function  lowess_model(xs, ys, f = 2/3, nsteps = 3, delta = 0.01*tupleDiff(extrema(xs)))
+function  lowess_model(xs, ys, f = 2/3, nsteps = 3, delta = 0.01*(extrema(xs)[2]- extrema(xs)[1]))
     model = lowess(xs, ys, f, nsteps, delta)
     prediction_model = interpolate(model, BSpline(Linear()))
     prediction_model = scale(prediction_model, range(extrema(xs)[1], stop = extrema(xs)[2], length = length(xs)))    
