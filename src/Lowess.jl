@@ -11,37 +11,37 @@ function max(x::Int, y::Int)::Int
     return ((x > y) ? x : y)
 end
 
-function fmax(x, y)
+function fmax(x::Float64, y::Float64)::Float64
     return (x > y ? x : y)
 end
 
 function lowest(
-    x::Vector,
-    y::Vector,
+    x::Vector{Float64},
+    y::Vector{Float64},
     n::Int, 
-    xs,
-    ys::Vector,
+    xs::Float64,
+    ys::Vector{Float64},
     ys_pos::Int, 
     nleft::Int,
     nright::Int,
-    w::Vector,
+    w::Vector{Float64},
     userw::Bool, 
-    rw::Vector,
+    rw::Vector{Float64},
     ok::Vector{Int}
 )
-    b = 0.0
-    c = 0.0
-    r = 0.0
+    b::Float64 = 0.0
+    c::Float64 = 0.0
+    r::Float64 = 0.0
     nrt::Int = 0
 
     # Julia indexing starts at 1, so add 1 to all indexes
-    range = x[n] - x[1]
-    h = fmax(xs - x[nleft + 1], x[nright + 1] - xs)
-    h9 = 0.999 * h
-    h1 = 0.001 * h
+    range::Float64 = x[n] - x[1]
+    h::Float64 = fmax(xs - x[nleft + 1], x[nright + 1] - xs)
+    h9::Float64 = 0.999 * h
+    h1::Float64 = 0.001 * h
 
     # compute weights (pick up all ties on right)
-    a = 0.0     # sum of weights
+    a::Float64 = 0.0     # sum of weights
     j::Int = nleft   # initialize j
     
     for i in nleft:(n - 1)  # i = j at all times
@@ -128,41 +128,41 @@ function lowest(
 end 
 
 function lowess(
-    x::Vector,
-    y::Vector,
-    f = 2/3,
+    x::Vector{Float64},
+    y::Vector{Float64},
+    f::Float64 = 2/3,
     nsteps::Int = 3,
-    delta = 0.01*(maximum(x) - minimum(x))
-)
-
+    delta::Float64 = 0.01*(maximum(x) - minimum(x)),
+)::Vector{Float64}
     # defining needed variables
-    n = length(x)
-    ys = Vector(undef, n)
-    rw = Vector(undef, n)
-    res = Vector(undef, n)
 
-    iter = 0
-    ok = Vector{Int}(undef, 1)
+    n::Int = length(x)
+    ys::Vector{Float64} = Vector{Float64}(undef, n)
+    rw::Vector{Float64} = Vector{Float64}(undef, n)
+    res::Vector{Float64} = Vector{Float64}(undef, n)
+
+    iter::Int = 0
+    ok::Vector{Int} = Vector{Int}(undef, 1)
     # for safety, initialize ok to 0
     ok[1] = 0
 
-    i = 0
-    j = 0
-    last = 0
-    m1 = 0
-    m2 = 0
-    nleft = 0
-    nright = 0
-    ns = 0
-    d1 = 0.0
-    d2 = 0.0
-    denom = 0.0
-    alpha = 0.0
-    cut = 0.0
-    cmad = 0.0
-    c9 = 0.0
-    c1 = 0.0
-    r = 0.0
+    i::Int = 0
+    j::Int = 0
+    last::Int = 0
+    m1::Int = 0
+    m2::Int = 0
+    nleft::Int = 0
+    nright::Int = 0
+    ns::Int = 0
+    d1::Float64 = 0.0
+    d2::Float64 = 0.0
+    denom::Float64 = 0.0
+    alpha::Float64 = 0.0
+    cut::Float64 = 0.0
+    cmad::Float64 = 0.0
+    c9::Float64 = 0.0
+    c1::Float64 = 0.0
+    r::Float64 = 0.0
 
     if (n < 2)
         ys[1] = y[1]
@@ -250,8 +250,8 @@ function lowess(
         
         sort!(rw)
 
-        m1 = Int(floor(1 + n/2))
-        m2 = Int(n - m1 + 1)
+        m1 = 1 + n/2
+        m2 = n - m1 + 1
         cmad = 3.0 * (rw[m1 + 1] + rw[m2 + 1])  # 6 median abs resid
         c9 = 0.999 * cmad
         c1 = 0.001 * cmad
