@@ -39,6 +39,50 @@ scatter(xs, ys)
 plot!(us, vs, legend=false)
 ```
 
+# Benchmarks
+
+```julia
+using BenchmarkTools, using Loess, using Lowess
+xs = 10 .* rand(100)
+xs = sort(xs)
+ys = sin.(xs) .+ 0.5 * rand(100)
+
+@benchmark begin
+model = loess(xs, ys, span=0.5)
+us = range(extrema(xs)...; step = 0.1)
+vs = predict(model, us)
+end 
+```
+```
+BenchmarkTools.Trial: 6040 samples with 1 evaluation.
+ Range (min … max):  574.949 μs …   3.726 ms  ┊ GC (min … max):  0.00% … 64.41%
+ Time  (median):     693.659 μs               ┊ GC (median):     0.00%
+ Time  (mean ± σ):   825.584 μs ± 515.006 μs  ┊ GC (mean ± σ):  16.85% ± 18.90%
+```
+
+```julia
+@benchmark begin
+model = lowess_model(xs, ys, 0.2)
+us = range(extrema(xs)...; step = 0.1)
+vs = model(us)
+end
+```
+```
+BenchmarkTools.Trial: 10000 samples with 1 evaluation.
+ Range (min … max):  47.797 μs …  1.420 ms  ┊ GC (min … max): 0.00% … 95.55%
+ Time  (median):     58.236 μs              ┊ GC (median):    0.00%
+ Time  (mean ± σ):   58.842 μs ± 15.965 μs  ┊ GC (mean ± σ):  0.23% ±  0.96%
+```
+```julia
+@benchmark lowess(xs, ys, 0.2)
+```
+```
+BenchmarkTools.Trial: 10000 samples with 1 evaluation.
+ Range (min … max):  46.183 μs … 316.997 μs  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     56.525 μs               ┊ GC (median):    0.00%
+ Time  (mean ± σ):   57.325 μs ±   7.577 μs  ┊ GC (mean ± σ):  0.00% ± 0.00%
+```
+
 ![Example Plot](lowess.svg)
 
 ## References in Loess.jl
