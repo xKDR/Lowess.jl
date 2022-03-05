@@ -1,6 +1,6 @@
 name = "Lowess"
 uuid = "a2847a04-7795-4581-bff1-964344ea125d"
-authors = ["Ayush Patnaik, Siddhant Chaudary, xKDR Forum"]
+authors = ["Ayush Patnaik, Siddhant Chaudhary, xKDR Forum"]
 version = "0.1.0"
 
 [deps]

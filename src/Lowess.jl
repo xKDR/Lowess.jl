@@ -71,7 +71,7 @@ function lowest(
     else   # weighted least squares
         ok[1] = 1
 
-        # make sum of w[j] == 1
+        # make sum of w[j + 1] == 1
         j = nleft
         for i in nleft:nrt      # i = j at all times
             w[j + 1] = w[j + 1] / a
@@ -192,7 +192,7 @@ function lowess(
 
             lowest(x, y, n, x[i + 1], ys, i, nleft, nright, res, (iter > 1), rw, ok)
 
-            # fitted value at x[i]
+            # fitted value at x[i + 1]
             if (ok == 0)
                 ys[i + 1] = y[i + 1]
             end 
@@ -250,7 +250,7 @@ function lowess(
         
         sort!(rw)
 
-        m1 = 1 + n/2
+        m1 = floor(1 + n/2)
         m2 = n - m1 + 1
         cmad = 3.0 * (rw[m1 + 1] + rw[m2 + 1])  # 6 median abs resid
         c9 = 0.999 * cmad
