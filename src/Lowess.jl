@@ -3,45 +3,33 @@ using Interpolations
 
 export lowess, lowess_model
 
-function min(x::Int, y::Int)::Int
-    return ((x < y) ? x : y)
-end
-
-function max(x::Int, y::Int)::Int
-    return ((x > y) ? x : y)
-end
-
-function fmax(x::Float64, y::Float64)::Float64
-    return (x > y ? x : y)
-end
-
 function lowest(
-    x::Vector{Float64},
-    y::Vector{Float64},
-    n::Int, 
-    xs::Float64,
-    ys::Vector{Float64},
-    ys_pos::Int, 
-    nleft::Int,
-    nright::Int,
-    w::Vector{Float64},
+    x::AbstractVector{T},
+    y::AbstractVector{T},
+    n::Integer, 
+    xs::T,
+    ys::AbstractVector{T},
+    ys_pos::Integer, 
+    nleft::Integer,
+    nright::Integer,
+    w::AbstractVector{T},
     userw::Bool, 
-    rw::Vector{Float64},
+    rw::AbstractVector{T},
     ok::Vector{Int}
-)
-    b::Float64 = 0.0
-    c::Float64 = 0.0
-    r::Float64 = 0.0
+) where T <: AbstractFloat
+    b::T = 0.0
+    c::T = 0.0
+    r::T = 0.0
     nrt::Int = 0
 
     # Julia indexing starts at 1, so add 1 to all indexes
-    range::Float64 = x[n] - x[1]
-    h::Float64 = fmax(xs - x[nleft + 1], x[nright + 1] - xs)
-    h9::Float64 = 0.999 * h
-    h1::Float64 = 0.001 * h
+    range::T = x[n] - x[1]
+    h::T = max(xs - x[nleft + 1], x[nright + 1] - xs)
+    h9::T = 0.999 * h
+    h1::T = 0.001 * h
 
     # compute weights (pick up all ties on right)
-    a::Float64 = 0.0     # sum of weights
+    a::T = 0.0     # sum of weights
     j::Int = nleft   # initialize j
     
     for i in nleft:(n - 1)  # i = j at all times
@@ -128,18 +116,18 @@ function lowest(
 end 
 
 function lowess(
-    x::Vector{Float64},
-    y::Vector{Float64},
-    f::Float64 = 2/3,
-    nsteps::Int = 3,
-    delta::Float64 = 0.01*(maximum(x) - minimum(x)),
-)::Vector{Float64}
+    x::AbstractVector{T},
+    y::AbstractVector{T},
+    f::T = 2/3,
+    nsteps::Integer = 3,
+    delta::T = 0.01*(maximum(x) - minimum(x)),
+) where T <: AbstractFloat
     # defining needed variables
 
     n::Int = length(x)
-    ys::Vector{Float64} = Vector{Float64}(undef, n)
-    rw::Vector{Float64} = Vector{Float64}(undef, n)
-    res::Vector{Float64} = Vector{Float64}(undef, n)
+    ys::Vector{T} = Vector{T}(undef, n)
+    rw::Vector{T} = Vector{T}(undef, n)
+    res::Vector{T} = Vector{T}(undef, n)
 
     iter::Int = 0
     ok::Vector{Int} = Vector{Int}(undef, 1)
@@ -154,15 +142,15 @@ function lowess(
     nleft::Int = 0
     nright::Int = 0
     ns::Int = 0
-    d1::Float64 = 0.0
-    d2::Float64 = 0.0
-    denom::Float64 = 0.0
-    alpha::Float64 = 0.0
-    cut::Float64 = 0.0
-    cmad::Float64 = 0.0
-    c9::Float64 = 0.0
-    c1::Float64 = 0.0
-    r::Float64 = 0.0
+    d1::T = 0.0
+    d2::T = 0.0
+    denom::T = 0.0
+    alpha::T = 0.0
+    cut::T = 0.0
+    cmad::T = 0.0
+    c9::T = 0.0
+    c1::T = 0.0
+    r::T = 0.0
 
     if (n < 2)
         ys[1] = y[1]
