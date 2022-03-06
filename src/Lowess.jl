@@ -115,6 +115,30 @@ function lowest(
     end 
 end 
 
+"""
+```julia
+lowess(x, y, f = 2/3, nsteps = 3, delta = 0.01*(maximum(x) - minimum(x)))
+```
+
+Compute the smooth of a scatterplot of `y` against `x` using robust locally weighted regression. Input vectors `x` and `y` must contain values of type `T`, where `T <: AbstractFloat`. Returns a vector `ys`; `ys[i]` is the fitted value at `x[i]`. To get the smooth plot, `ys` must be plotted against `x`.
+
+# Arguments
+- `x::AbstractVector{T}`: Abscissas of the points on the scatterplot. `x` must be ordered.
+- `y::AbstractVector{T}`: Ordinates of the points in the scatterplot. 
+- `f::T`: The amount of smoothing. 
+- `nsteps::Integer`: Number of iterations in the robust fit.
+- `delta::T`: A nonnegative parameter which may be used to save computations.
+
+# Example
+```julia
+using Lowess, Plots
+x = sort(10 .* rand(100))
+y = sin.(x) .+ 0.5 * rand(100)
+ys = lowess(x, y, 0.2)
+scatter(x, y)
+plot!(x, ys)
+```
+"""
 function lowess(
     x::AbstractVector{T},
     y::AbstractVector{T},
@@ -257,6 +281,29 @@ function lowess(
     return ys 
 end 
 
+"""
+```julia
+lowess_model(xs, ys, f = 2/3, nsteps = 3, delta = 0.01*(maximum(xs) - minimum(xs)))
+```
+
+Return a lowess model which can be used to predict the ordinate corresponding to a new abscissa. Has the same arguments as `lowess`.
+
+# Example
+```julia
+using Lowess, Plots
+xs = 10 .* rand(100)
+xs = sort(xs)
+ys = sin.(xs) .+ 0.5 * rand(100)
+
+model = lowess_model(xs, ys, 0.2)
+
+us = range(extrema(xs)...; step = 0.1)
+vs = model(us)
+
+scatter(xs, ys)
+plot!(us, vs, legend=false)
+```
+"""
 function  lowess_model(xs, ys, f = 2/3, nsteps = 3, delta = 0.01*(maximum(xs) - minimum(xs)))
     model = lowess(xs, ys, f, nsteps, delta)
     prediction_model = interpolate(model, BSpline(Linear()))
