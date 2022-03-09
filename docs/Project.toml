@@ -1,3 +1,5 @@
 [deps]
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
-Lowess = "a2847a04-7795-4581-bff1-964344ea125d"
+
+[compat]
+Documenter = "0.27"
