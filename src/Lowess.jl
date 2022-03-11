@@ -311,4 +311,27 @@ function  lowess_model(xs, ys, f = 2/3, nsteps = 3, delta = 0.01*(maximum(xs) - 
     return prediction_model
 end
 
+function lowess(x::Array{Int},
+    y::AbstractVector{T},
+    f::T = 2/3,
+    nsteps::Integer = 3,
+    delta::T = 0.01*(maximum(x) - minimum(x))) where T <: AbstractFloat
+    return lowess(Array{Float64}(x), y, f, nsteps, delta)
+end
+
+function lowess(x::AbstractVector{T},
+    y::Array{Int},
+    f::T = 2/3,
+    nsteps::Integer = 3,
+    delta::T = 0.01*(maximum(x) - minimum(x))) where T <: AbstractFloat
+    return lowess(x, Array{Float64}(y), f, nsteps, delta)
+end
+
+function lowess(x::Array{Int},
+    y::Array{Int},
+    f::T = 2/3,
+    nsteps::Integer = 3,
+    delta::T = 0.01*(maximum(x) - minimum(x))) where T <: AbstractFloat
+    return lowess(Array{Float64}(x), Array{Float64}(y), f, nsteps, delta)
+end
 end
