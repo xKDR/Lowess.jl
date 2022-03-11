@@ -120,11 +120,11 @@ end
 lowess(x, y, f = 2/3, nsteps = 3, delta = 0.01*(maximum(x) - minimum(x)))
 ```
 
-Compute the smooth of a scatterplot of `y` against `x` using robust locally weighted regression. Input vectors `x` and `y` must contain values of type `T`, where `T <: AbstractFloat`. Returns a vector `ys`; `ys[i]` is the fitted value at `x[i]`. To get the smooth plot, `ys` must be plotted against `x`.
+Compute the smooth of a scatterplot of `y` against `x` using robust locally weighted regression. Input vectors `x` and `y` must contain either integers or floats. Parameters `f` and `delta` must be of type `T`, where `T <: AbstractFloat`. Returns a vector `ys`; `ys[i]` is the fitted value at `x[i]`. To get the smooth plot, `ys` must be plotted against `x`. 
 
 # Arguments
-- `x::AbstractVector{T}`: Abscissas of the points on the scatterplot. `x` must be ordered.
-- `y::AbstractVector{T}`: Ordinates of the points in the scatterplot. 
+- `x::Vector`: Abscissas of the points on the scatterplot. `x` must be ordered.
+- `y::Vector`: Ordinates of the points in the scatterplot. 
 - `f::T`: The amount of smoothing. 
 - `nsteps::Integer`: Number of iterations in the robust fit.
 - `delta::T`: A nonnegative parameter which may be used to save computations.
@@ -311,7 +311,7 @@ function  lowess_model(xs, ys, f = 2/3, nsteps = 3, delta = 0.01*(maximum(xs) - 
     return prediction_model
 end
 
-function lowess(x::Array{Int},
+function lowess(x::Vector{Int},
     y::AbstractVector{T},
     f::T = 2/3,
     nsteps::Integer = 3,
@@ -320,15 +320,15 @@ function lowess(x::Array{Int},
 end
 
 function lowess(x::AbstractVector{T},
-    y::Array{Int},
+    y::Vector{Int},
     f::T = 2/3,
     nsteps::Integer = 3,
     delta::T = 0.01*(maximum(x) - minimum(x))) where T <: AbstractFloat
     return lowess(x, Array{Float64}(y), f, nsteps, delta)
 end
 
-function lowess(x::Array{Int},
-    y::Array{Int},
+function lowess(x::Vector{Int},
+    y::Vector{Int},
     f::T = 2/3,
     nsteps::Integer = 3,
     delta::T = 0.01*(maximum(x) - minimum(x))) where T <: AbstractFloat
