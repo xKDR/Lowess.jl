@@ -1,6 +1,5 @@
 # Lowess
 
-[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://xKDR.github.io/Lowess.jl/stable)
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://xKDR.github.io/Lowess.jl/dev)
 [![Build Status](https://travis-ci.com/ayushpatnaikgit/Lowess.jl.svg?branch=main)](https://travis-ci.com/ayushpatnaikgit/Lowess.jl)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/ayushpatnaikgit/Lowess.jl?svg=true)](https://ci.appveyor.com/project/ayushpatnaikgit/Lowess-jl)
