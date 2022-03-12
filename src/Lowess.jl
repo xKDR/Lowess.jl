@@ -316,7 +316,7 @@ function lowess(x::AbstractVector{Int},
     f::T = 2/3,
     nsteps::Integer = 3,
     delta::T = 0.01*(maximum(x) - minimum(x))) where T <: AbstractFloat
-    return lowess(Array{Float64}(x), y, f, nsteps, delta)
+    return lowess(Vector{Float64}(x), y, f, nsteps, delta)
 end
 
 function lowess(x::AbstractVector{T},
@@ -324,7 +324,7 @@ function lowess(x::AbstractVector{T},
     f::T = 2/3,
     nsteps::Integer = 3,
     delta::T = 0.01*(maximum(x) - minimum(x))) where T <: AbstractFloat
-    return lowess(x, Array{Float64}(y), f, nsteps, delta)
+    return lowess(x, Vector{Float64}(y), f, nsteps, delta)
 end
 
 function lowess(x::AbstractVector{Int},
@@ -332,6 +332,6 @@ function lowess(x::AbstractVector{Int},
     f::T = 2/3,
     nsteps::Integer = 3,
     delta::T = 0.01*(maximum(x) - minimum(x))) where T <: AbstractFloat
-    return lowess(Array{Float64}(x), Array{Float64}(y), f, nsteps, delta)
+    return lowess(Vector{Float64}(x), Vector{Float64}(y), f, nsteps, delta)
 end
 end
