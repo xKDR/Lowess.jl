@@ -1,12 +1,8 @@
 # Lowess
 
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://xKDR.github.io/Lowess.jl/dev)
-[![Build Status](https://travis-ci.com/ayushpatnaikgit/Lowess.jl.svg?branch=main)](https://travis-ci.com/ayushpatnaikgit/Lowess.jl)
-[![Build Status](https://ci.appveyor.com/api/projects/status/github/ayushpatnaikgit/Lowess.jl?svg=true)](https://ci.appveyor.com/project/ayushpatnaikgit/Lowess-jl)
-[![Build Status](https://api.cirrus-ci.com/github/xKDR/Lowess.jl.svg)](https://cirrus-ci.com/github/ayushpatnaikgit/Lowess.jl)
-[![Coverage](https://codecov.io/gh/xKDR/Lowess.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/ayushpatnaikgit/Lowess.jl)
-[![Coverage](https://coveralls.io/repos/github/ayushpatnaikgit/Lowess.jl/badge.svg?branch=main)](https://coveralls.io/github/ayushpatnaikgit/Lowess.jl?branch=main)
-
+![Build Status](https://github.com/xKDR/Lowess.jl/actions/workflows/ci.yml/badge.svg)
+![Build Status](https://github.com/xKDR/Lowess.jl/actions/workflows/documentation.yml/badge.svg)
 This package is an alternative to https://github.com/JuliaStats/Loess.jl
 
 ## To install: 
