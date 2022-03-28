@@ -8,7 +8,7 @@ This package is an alternative to https://github.com/JuliaStats/Loess.jl
 
 ## To install: 
 ```Julia
- add "git://github.com/xKDR/Lowess.jl.git"
+ add "https://github.com/xKDR/Lowess.jl.git"
 ```
 
 This is a pure Julia lowess implementation. The lowess.c code from https://github.com/wch/r-source/blob/trunk/src/library/stats/src/lowess.c has been hand-translated to Julia. 
