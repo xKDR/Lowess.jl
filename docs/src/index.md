@@ -38,7 +38,7 @@ The above code creates some random data points sampled out of a sine curve, with
 
 Finally, we get the scatter plot of the input points, and the smooth plot using `us` and `vs`. The plot looks something like the following. 
 
-![Example Plot](../../lowess.svg)
+![Example Plot](lowess.svg)
 
 # Comparison with [Loess.jl](https://github.com/JuliaStats/Loess.jl)
 
