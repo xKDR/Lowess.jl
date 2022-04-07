@@ -175,13 +175,14 @@ function lowess(
     c9::T = 0.0
     c1::T = 0.0
     r::T = 0.0
+    sc::T = 0.0
 
     if (n < 2)
         ys[1] = y[1]
         return ys
     end 
 
-    ns = max(min(floor(Int, f*n), n), 2)  # at least two, at most n points
+    ns = max(min(floor(Int, f*n + 1e-7), n), 2)  # at least two, at most n points
     for iter in 1:(nsteps + 1)  # robustness iterations
         nleft = 0
         nright = ns - 1
@@ -251,6 +252,13 @@ function lowess(
         for i in 0:(n - 1) 
             res[i + 1] = y[i + 1] - ys[i + 1]
         end
+
+        # overall scale estimate
+        sc = 0.0
+        for i in 0:(n - 1)
+            sc = sc + abs(res[i + 1])
+        end
+        sc /= n
         
         if (iter > nsteps)  # compute robustness weights except last time
             break
@@ -260,26 +268,55 @@ function lowess(
             rw[i + 1] = abs(res[i + 1])
         end
         
-        sort!(rw)
+        m1 = floor(n/2)
+        # partial sort, for m1 and m2
+        partialsort!(rw, m1 + 1)
 
-        m1 = floor(1 + n/2)
-        m2 = n - m1 + 1
-        cmad = 3.0 * (rw[m1 + 1] + rw[m2 + 1])  # 6 median abs resid
+        if (n % 2 == 0)
+            m2 = n - m1 - 1
+            partialsort!(rw, m2 + 1)
+            cmad = 3.0 * (rw[m1 + 1] + rw[m2 + 1])
+        else
+            cmad = 6.0 * rw[m1 + 1]
+        end
+
+        if (cmad < 1e-7 * sc)   # effectively zero
+            break
+        end
+
         c9 = 0.999 * cmad
         c1 = 0.001 * cmad
+
         for i in 0:(n - 1)
             r = abs(res[i + 1])
-            if (r <= c1)    # near 0, avoid underflow
-                rw[i + 1] = 1.0
-            elseif (r > c9) # near 1, avoid underflow
-                rw[i + 1] = 0.0
-            else 
+
+            if (r <= c1)
+                rw[i + 1] = 1
+            elseif (r <= c9)
                 rw[i + 1] = (1.0 - (r / cmad)^2)^2
+            else
+                rw[i + 1] = 0.0
             end
-        end 
+        end
+
+        # m1 = floor(1 + n/2)
+        # m2 = n - m1 + 1
+        # cmad = 3.0 * (rw[m1 + 1] + rw[m2 + 1])  # 6 median abs resid
+        # c9 = 0.999 * cmad
+        # c1 = 0.001 * cmad
+        # for i in 0:(n - 1)
+        #     r = abs(res[i + 1])
+        #     if (r <= c1)    # near 0, avoid underflow
+        #         rw[i + 1] = 1.0
+        #     elseif (r > c9) # near 1, avoid underflow
+        #         rw[i + 1] = 0.0
+        #     else 
+        #         rw[i + 1] = (1.0 - (r / cmad)^2)^2
+        #     end
+        # end 
     end
     return ys 
-end 
+end
 
 """
 ```julia
