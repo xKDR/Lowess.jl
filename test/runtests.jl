@@ -1,13 +1,14 @@
 using Lowess
 using Test
+using Distributions
 
 @testset "Testing with floating point numbers" begin
     for i in 1:100
         n = rand(6:100)
-        xs = rand(1:100.0, n)
+        xs = rand(Uniform(1.0, 100.0), n)
         xs = sort(xs)
-        ys = rand(1:100.0, n)
-        zs = lowess(xs, ys, rand(0.1:1.0), rand(3:10), rand(0.1:1.0))
+        ys = rand(Uniform(1.0, 100.0), n)
+        zs = lowess(xs, ys, rand(Uniform(0.1, 1.0)), rand(3:10), rand(Uniform(0.0, 1.0)))
         @test length(zs) == length(ys)
     end
 end
@@ -18,7 +19,7 @@ end
         xs = rand(1:100, n)
         xs = sort(xs)
         ys = rand(1:100, n)
-        zs = lowess(xs, ys, rand(0.1:1.0), rand(3:10), rand(0.1:1.0))
+        zs = lowess(xs, ys, rand(Uniform(0.1, 1.0)), rand(3:10), rand(Uniform(0.0, 1.0)))
         @test length(zs) == length(ys)
     end
 
@@ -27,7 +28,7 @@ end
         xs = rand(1:100.0, n)
         xs = sort(xs)
         ys = rand(1:100, n)
-        zs = lowess(xs, ys, rand(0.1:1.0), rand(3:10), rand(0.1:1.0))
+        zs = lowess(xs, ys, rand(Uniform(0.1, 1.0)), rand(3:10), rand(Uniform(0.0, 1.0)))
         @test length(zs) == length(ys)
     end
 
@@ -36,7 +37,7 @@ end
         xs = rand(1:100, n)
         xs = sort(xs)
         ys = rand(1:100.0, n)
-        zs = lowess(xs, ys, rand(0.1:1.0), rand(3:10), rand(0.1:1.0))
+        zs = lowess(xs, ys, rand(Uniform(0.1, 1.0)), rand(3:10), rand(Uniform(0.0, 1.0)))
         @test length(zs) == length(ys)
     end
 
