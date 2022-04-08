@@ -4,6 +4,11 @@
 
 #define FALSE 0
 #define TRUE 1
+
+void printvec(double *vec, int n){
+	for (int i = 0; i < n; i++)
+		printf("%f\n", vec[i]);
+}
 	
 static int rcmp(double x, double y, int nalast)
 {
@@ -63,7 +68,7 @@ static void rPsort2(double *x, size_t lo, size_t hi, size_t k)
 	}
 }
 
-static void rPsort(double *x, int n, int k)
+void rPsort(double *x, int n, int k)
 {
 	rPsort2(x, 0, n - 1, k);
 }
@@ -273,6 +278,7 @@ void Rclowess(double *x, double *y, int n,
 	m1 = n/2;
 	/* partial sort, for m1 & m2 */
 	rPsort(rw, n, m1);
+	printvec(rw, n);
 	if(n % 2 == 0) {
 	    m2 = n-m1-1;
 	    rPsort(rw, n, m2);

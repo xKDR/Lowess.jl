@@ -3,6 +3,60 @@ using Interpolations
 
 export lowess, lowess_model
 
+function rcmp(x::T, y::T, nalast::Int)::Int where T <: AbstractFloat
+    if (x < y)
+        return -1
+    end 
+    if (x > y)
+        return 1
+    end 
+    return 0
+end
+
+function rPsort2(x::Vector{T}, lo::Int, hi::Int, k::Int) where T <: AbstractFloat
+    v::T = 0.0
+    w::T = 0.0
+    nalast::Int = 1
+    L::Int = 0
+    R::Int = 0
+    i::Int = 0
+    j::Int = 0
+
+    L = lo
+    R = hi
+    while (L < R)
+        v = x[k]
+        
+        i = L
+        j = R
+        while (i <= j)
+            while (rcmp(x[i], v, nalast) < 0) 
+                i = i + 1
+            end 
+            while (rcmp(v, x[j], nalast) < 0)
+                j = j - 1
+            end 
+            if (i <= j)
+                w = x[i]
+                x[i] = x[j]
+                i = i + 1
+                x[j] = w
+                j = j - 1
+            end
+        end
+        if (j < k)
+            L = i
+        end
+        if (k < i)
+            R = j
+        end  
+    end 
+end 
+
+function rPsort(x::Vector{T}, n::Int, k::Int) where T <: AbstractFloat
+    rPsort2(x, 1, n, k)
+end 
+
 function lowest(
     x::AbstractVector{T},
     y::AbstractVector{T},
@@ -24,7 +78,7 @@ function lowest(
 
     # Julia indexing starts at 1, so add 1 to all indexes
     range::T = x[n] - x[1]
-    h::T = max(xs - x[nleft + 1], x[nright + 1] - xs)
+    h::T = max(xs - x[nleft], x[nright] - xs)
     h9::T = 0.999 * h
     h1::T = 0.001 * h
 
@@ -32,20 +86,22 @@ function lowest(
     a::T = 0.0     # sum of weights
     j::Int = nleft   # initialize j
     
-    for i in nleft:(n - 1)  # i = j at all times
-        w[j + 1] = 0.0
-        r = abs(x[j + 1] - xs)      # replaced fabs with abs
+    for i in nleft:n  # i = j at all times
+        w[j] = 0.0
+        r = abs(x[j] - xs)      # replaced fabs with abs
         if (r <= h9)       # small enough for non-zero weight
-            if (r > h1)
-                w[j + 1] = (1.0 - (r/h)^3)^3
+            if (r <= h1)
+                w[j] = 1.0
             else 
-                w[j + 1] = 1.0
-            end
-            if (userw)
-                w[j + 1] = rw[j + 1] * w[j + 1]
+                w[j] = (1 - (r / h)^3)^3
             end 
-            a += w[j + 1]
-        elseif (x[j + 1] > xs)      # get out at first zero wt on right
+            
+            if (userw)
+                w[j] = w[j] * rw[j]
+            end
+
+            a += w[j]
+        elseif (x[j] > xs)      # get out at first zero wt on right
             break
         end
         
@@ -62,7 +118,7 @@ function lowest(
         # make sum of w[j + 1] == 1
         j = nleft
         for i in nleft:nrt      # i = j at all times
-            w[j + 1] = w[j + 1] / a
+            w[j] = w[j] / a
 
             # increment j
             j = j + 1
@@ -73,7 +129,7 @@ function lowest(
             j = nleft
             a = 0.0
             for i in nleft:nrt  # i = j at all times
-                a += w[j + 1] * x[j + 1]
+                a += w[j] * x[j]
                 
                 # increment j
                 j = j + 1
@@ -84,11 +140,11 @@ function lowest(
             j = nleft
             c = 0.0
             for i in nleft:nrt  # i = j at all times
-                c += w[j + 1] * (x[j + 1] - a) * (x[j + 1] - a)
+                c += w[j] * (x[j] - a) * (x[j] - a)
 
                 # increment j 
                 j = j + 1
-            end 
+            end
 
             if (sqrt(c) > 0.001 * range)
                 # points are spread out enough to compute slope
@@ -96,7 +152,7 @@ function lowest(
 
                 j = nleft
                 for i in nleft:nrt  # i = j at all times
-                    w[j + 1] = w[j + 1] * (1.0 + b*(x[j + 1] - a))
+                    w[j] = w[j] * (1.0 + b*(x[j] - a))
 
                     # increment 
                     j = j + 1
@@ -105,13 +161,13 @@ function lowest(
         end
 
         j = nleft
-        ys[ys_pos + 1] = 0.0
+        ys[ys_pos] = 0.0
         for i in nleft:nrt  # i = j at all times
-            ys[ys_pos + 1] += w[j + 1] * y[j + 1]
+            ys[ys_pos] += w[j] * y[j]
 
             # increment j
             j = j + 1
-        end 
+        end
     end 
 end 
 
@@ -147,7 +203,6 @@ function lowess(
     delta::T = 0.01*(maximum(x) - minimum(x)),
 ) where T <: AbstractFloat
     # defining needed variables
-
     n::Int = length(x)
     ys::Vector{T} = Vector{T}(undef, n)
     rw::Vector{T} = Vector{T}(undef, n)
@@ -182,41 +237,43 @@ function lowess(
         return ys
     end 
 
-    ns = max(min(floor(Int, f*n + 1e-7), n), 2)  # at least two, at most n points
-    for iter in 1:(nsteps + 1)  # robustness iterations
-        nleft = 0
-        nright = ns - 1
-        last = -1   # index of prev estimated point
-        i = 0   # index of current point
+    ns = max(min(floor(Int, f*n + 0.0000001), n), 2)  # at least two, at most n points
+    
+    iter = 1
+    while (iter <= nsteps + 1)  # robustness iterations
+        nleft = 1
+        nright = ns
+        last = 0   # index of prev estimated point
+        i = 1   # index of current point
 
         while true 
-            while (nright < n - 1)
+            if (nright < n)
                 # move nleft, nright to right if radius decreases
-                d1 = x[i + 1] - x[nleft + 1]
-                d2 = x[nright + 2] - x[i + 1]
-                # if d1 <= d2 with x[nright + 2] == x[nright + 1], lowest fixes
-                if (d1 <= d2)
-                    break
+                d1 = x[i] - x[nleft]
+                d2 = x[nright + 1] - x[i]
+
+                # if d1 <= d2 with x[nright + 1] == x[nright], lowest fixes
+                if (d1 > d2)
+                    # radius will not decrease by move right
+                    nleft = nleft + 1;
+                    nright = nright + 1;
+                    continue
                 end
-                # radius will not decrease by move right
-                nleft = nleft + 1;
-	            nright = nright + 1;
             end
 
-            lowest(x, y, n, x[i + 1], ys, i, nleft, nright, res, (iter > 1), rw, ok)
-
-            # fitted value at x[i + 1]
-            if (ok == 0)
-                ys[i + 1] = y[i + 1]
+            # fitted value at x[i]
+            lowest(x, y, n, x[i], ys, i, nleft, nright, res, (iter > 1), rw, ok)
+            if (ok[1] == 0)
+                ys[i] = y[i]
             end 
 
             # all weights zero - copy over value (all rw==0)
             if (last < i - 1)   # skipped points -- interpolate
-                denom = x[i + 1] - x[last + 1]  # non-zero - proof?
+                denom = x[i] - x[last]  # non-zero - proof?
                 j = last + 1
                 for t in (last + 1):(i - 1) # t = j at all times
-                    alpha = (x[j + 1] - x[last + 1]) / denom
-                    ys[j + 1] = alpha * ys[i + 1] + (1.0 - alpha) * ys[last + 1]
+                    alpha = (x[j] - x[last]) / denom
+                    ys[j] = alpha * ys[i] + (1.0 - alpha) * ys[last]
 
                     # increment j
                     j = j + 1
@@ -224,17 +281,17 @@ function lowess(
             end 
 
             last = i    # last point actually estimated
-            cut = x[last + 1] + delta   # x coord of close points
+            cut = x[last] + delta   # x coord of close points
 
             # find close points
             i = last + 1
-            for t in (last + 1):(n - 1) # t = i at all times
-                if (x[i + 1] > cut) # i one beyond last pt within cut
+            for t in (last + 1):n # t = i at all times
+                if (x[i] > cut) # i one beyond last pt within cut
                     break
                 end 
                 
-                if (x[i + 1] == x[last + 1])
-                    ys[i + 1] = ys[last + 1]
+                if (x[i] == x[last])
+                    ys[i] = ys[last]
                     last = i
                 end 
 
@@ -245,7 +302,9 @@ function lowess(
             
             # back 1 point so interpolation within delta, but always go forward
             # check do while loop condition
-            (last < n - 1) || break
+            if (last >= n)
+                break
+            end
         end
         
         # residuals
@@ -270,11 +329,11 @@ function lowess(
         
         m1 = floor(n/2)
         # partial sort, for m1 and m2
-        partialsort!(rw, m1 + 1)
-
+        rPsort(rw, n, m1 + 1)
+        println(rw)
         if (n % 2 == 0)
             m2 = n - m1 - 1
-            partialsort!(rw, m2 + 1)
+            rPsort(rw, n, m2 + 1)
             cmad = 3.0 * (rw[m1 + 1] + rw[m2 + 1])
         else
             cmad = 6.0 * rw[m1 + 1]
@@ -291,7 +350,7 @@ function lowess(
             r = abs(res[i + 1])
 
             if (r <= c1)
-                rw[i + 1] = 1
+                rw[i + 1] = 1.0
             elseif (r <= c9)
                 rw[i + 1] = (1.0 - (r / cmad)^2)^2
             else
@@ -314,8 +373,11 @@ function lowess(
         #         rw[i + 1] = (1.0 - (r / cmad)^2)^2
         #     end
         # end 
+
+        # increment iter
+        iter = iter + 1
     end
-    return ys 
+    return ys
 end
 
 """

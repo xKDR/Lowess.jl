@@ -2,13 +2,17 @@ module LowessWrapper
 
 export Rclowess
 
+function tupleDiff(p::Tuple{Float64, Float64})::Float64
+    return p[2] - p[1]
+end
+
 function Rclowess(
-    x::Vector{Float64},
-    y::Vector{Float64},
-    f::Float64=2/3,
-    nsteps::Int64=3,
-    delta::Float64=0.01*tupleDiff(extrema(x))
-)::Vector{Float64}
+    x::Vector{T},
+    y::Vector{T},
+    f::T=2/3,
+    nsteps::Int=3,
+    delta::T=0.01*tupleDiff(extrema(x))
+)::Vector{T} where T <: AbstractFloat
     # variables needed to call lowess
     n::UInt = length(x)
     ys::Vector{Float64} = Vector{Float64}(undef, n)
@@ -35,4 +39,17 @@ function Rclowess(
     return ys
 end
 
-end 
+function Rpsort(x::Vector{T}, n::Int, k::Int) where T <: AbstractFloat
+    ccall(
+        (:rPsort, "./sharedlib/libRlowess.so"),  # lowess
+        Cvoid,   # return type
+        (
+            Ptr{Cdouble},   # x
+            Csize_t,        # n
+            Csize_t,        # k
+        ),  
+        x, n, k
+    )
+end
+
+end
