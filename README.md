@@ -12,7 +12,7 @@ This package is an alternative to https://github.com/JuliaStats/Loess.jl
  add "https://github.com/xKDR/Lowess.jl.git"
 ```
 
-This is a pure Julia lowess implementation. The lowess.c code from https://github.com/wch/r-source/blob/trunk/src/library/stats/src/lowess.c has been hand-translated to Julia. 
+This is a pure Julia lowess implementation. The lowess.c code from https://github.com/carlohamalainen/cl-lowess/blob/master/lowess.c has been hand-translated to Julia. 
 
 ## Synopsis
 
@@ -79,6 +79,25 @@ BenchmarkTools.Trial: 10000 samples with 1 evaluation.
  Time  (median):     56.525 μs               ┊ GC (median):    0.00%
  Time  (mean ± σ):   57.325 μs ±   7.577 μs  ┊ GC (mean ± σ):  0.00% ± 0.00%
 ```
+
+# Example Plot
+
+This example plot is generated using the following code. 
+
+    using Lowess, Plots
+    RAND_MAX = 2147483647
+    n = 200
+    xs = 1:200
+    xs = (i -> i*2*pi/n).(xs)
+    ys = sin.(xs) .+ rand(0:RAND_MAX - 1, 200)/(RAND_MAX + 1)
+    f = 0.25
+    nsteps = 3
+    delta = 0.3
+
+    zs = lowess(xs, ys, f, nsteps, delta)
+
+    scatter(xs, ys)
+    plot!(xs, zs)
 
 ![Example Plot](lowess.svg)
 
