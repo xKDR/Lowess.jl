@@ -24,3 +24,18 @@ jobs:
               run: julia --project=. -e 'using Pkg; Pkg.test("Lowess", coverage=true)'
             - name: Codecov
               run: julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
+    ctest: 
+        name: CTest
+        runs-on: ubuntu-latest
+        steps: 
+            - uses: actions/checkout@v2
+            - uses: julia-actions/setup-julia@latest
+              with:
+                version: '1.7'
+            - name: Install test dependencies
+              run: julia --project=test/ -e 'using Pkg; Pkg.instantiate()'
+            - name: Run C tests
+              run: |
+                cd test/
+                make 
+                julia --project ctest.jl
