@@ -1,13 +1,12 @@
 ```@meta
 CurrentModule = Lowess
 ```
+Documentation for [Lowess](https://github.com/xKDR/Lowess.jl).
 
-# Lowess
-
-Documentation for [Lowess](https://github.com/ayushpatnaikgit/Lowess.jl).
-
-```@index
+```@contents
+Pages=["index.md"]
 ```
+# Lowess
 
 This package includes a pure Julia `lowess` function, which is an implementation 
 of the LOWESS smoother (references given at the end of the documentation), along with 
@@ -15,10 +14,12 @@ a `lowess_model` function can be used to make corresponding models.
 
 # Tutorial
 
-In this section we will go through a simple example to see how our model works. Consider the following function. 
+In this section we will go through a simple example to see how the package works. Consider the following code snippet. 
 
-```julia 
-using Lowess, Plots
+```@example 
+using Lowess, Plots, Random
+Random.seed!(42)
+
 xs = 10 .* rand(100)
 xs = sort(xs)
 ys = sin.(xs) .+ 0.5 * rand(100)
@@ -31,14 +32,11 @@ vs = model(us)
 scatter(xs, ys)
 plot!(us, vs, legend=false)
 ```
-
 The above code creates some random data points sampled out of a sine curve, with some noise added to the ordinates. A model is created using this data with `f = 0.2` (`f` is the parameter which controls the amount of smoothing). 
 
 `us` is a vector of abscissas which lie in the range of the abscissas which were passed as input to the model. To get the predicted smooth values for `us`, we are passing it to the model; the result will be the vector `vs`, the vector of predicted values. 
 
-Finally, we get the scatter plot of the input points, and the smooth plot using `us` and `vs`. The plot looks something like the following. 
-
-![Example Plot](lowess.svg)
+Finally, we get the scatter plot of the input points, and the smooth plot using `us` and `vs`. 
 
 # Comparison with [Loess.jl](https://github.com/JuliaStats/Loess.jl)
 
@@ -47,11 +45,13 @@ exports the more general LOESS predictor. In this section, we benchmark the perf
 
 For our test, we use the example given in the tutorial. For the benchmarks, we use the `BenchmarkTools` package. In the below code, we benchmark the performance of our package code.
 
-```julia
-using BenchmarkTools, Lowess
-xs = 10 .* rand(100)
-xs = sort(xs)
-ys = sin.(xs) .+ 0.5 * rand(100)
+```@repl benchmarking
+using BenchmarkTools, Lowess, Random;
+Random.seed!(42);
+
+xs = 10 .* rand(100);
+xs = sort(xs);
+ys = sin.(xs) .+ 0.5 * rand(100);
 
 @benchmark begin
     model = lowess_model(xs, ys, 0.2)
@@ -59,36 +59,16 @@ ys = sin.(xs) .+ 0.5 * rand(100)
     vs = model(us)
 end
 ```
-
-The output of the above performance benchmark is given below.
-
-```julia-repl
-BenchmarkTools.Trial: 10000 samples with 1 evaluation.
-Range (min … max):  47.797 μs …  1.420 ms  ┊ GC (min … max): 0.00% … 95.55%
-Time  (median):     58.236 μs              ┊ GC (median):    0.00%
-Time  (mean ± σ):   58.842 μs ± 15.965 μs  ┊ GC (mean ± σ):  0.23% ±  0.96%
-```
-
 The exact same benchmarking code, but with [Loess.jl](https://github.com/JuliaStats/Loess.jl), is given below. 
 
-```julia
-using Loess
+```@repl benchmarking
+using Loess;
 @benchmark begin
     model = loess(xs, ys, span=0.5)
     us = range(extrema(xs)...; step = 0.1)
     vs = predict(model, us)
 end
 ```
-
-The output of the above benchmarking test is given below.
-
-```julia-repl
-BenchmarkTools.Trial: 6040 samples with 1 evaluation.
- Range (min … max):  574.949 μs …   3.726 ms  ┊ GC (min … max):  0.00% … 64.41%
- Time  (median):     693.659 μs               ┊ GC (median):     0.00%
- Time  (mean ± σ):   825.584 μs ± 515.006 μs  ┊ GC (mean ± σ):  16.85% ± 18.90%
-```
-
 For the above test, our package code runs much faster compared to [Loess.jl](https://github.com/JuliaStats/Loess.jl).
 
 # References
