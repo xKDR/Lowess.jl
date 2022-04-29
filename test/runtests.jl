@@ -3,7 +3,7 @@ using Test
 using Distributions
 
 @testset "Testing with floating point numbers" begin
-    for i in 1:500
+    for i = 1:500
         n = rand(6:100)
         xs = rand(Uniform(1.0, 100.0), n)
         xs = sort(xs)
@@ -14,7 +14,7 @@ using Distributions
 end
 
 @testset "Testing with integers" begin
-    for i in 1:500
+    for i = 1:500
         n = rand(6:100)
         xs = rand(1:100, n)
         xs = sort(xs)

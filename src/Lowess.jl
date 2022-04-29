@@ -6,17 +6,17 @@ export lowess, lowess_model
 function lowest(
     x::AbstractVector{T},
     y::AbstractVector{T},
-    n::Integer, 
+    n::Integer,
     xs::T,
     ys::AbstractVector{T},
-    ys_pos::Integer, 
+    ys_pos::Integer,
     nleft::Integer,
     nright::Integer,
     w::AbstractVector{T},
-    userw::Bool, 
+    userw::Bool,
     rw::AbstractVector{T},
     ok::Vector{Int}
-) where T <: AbstractFloat
+) where {T <: AbstractFloat}
     b::T = 0.0
     c::T = 0.0
     r::T = 0.0
@@ -31,28 +31,28 @@ function lowest(
     # compute weights (pick up all ties on right)
     a::T = 0.0     # sum of weights
     j::Int = nleft   # initialize j
-    
-    for i in nleft:(n - 1)  # i = j at all times
+
+    for i = nleft:(n - 1)  # i = j at all times
         w[j + 1] = 0.0
         r = abs(x[j + 1] - xs)      # replaced fabs with abs
         if (r <= h9)       # small enough for non-zero weight
             if (r > h1)
-                w[j + 1] = (1.0 - (r/h)^3)^3
-            else 
+                w[j + 1] = (1.0 - (r / h)^3)^3
+            else
                 w[j + 1] = 1.0
             end
             if (userw)
                 w[j + 1] = rw[j + 1] * w[j + 1]
-            end 
+            end
             a += w[j + 1]
         elseif (x[j + 1] > xs)      # get out at first zero wt on right
             break
         end
-        
+
         # increment j 
         j = j + 1
     end
-    
+
     nrt = j - 1     # rightmost pt (may be greater than nright because of ties)
     if (a <= 0.0)
         ok[1] = 0   # ok is a 1 length vector
@@ -61,7 +61,7 @@ function lowest(
 
         # make sum of w[j + 1] == 1
         j = nleft
-        for i in nleft:nrt      # i = j at all times
+        for i = nleft:nrt      # i = j at all times
             w[j + 1] = w[j + 1] / a
 
             # increment j
@@ -72,64 +72,66 @@ function lowest(
             # find weighted center of x values
             j = nleft
             a = 0.0
-            for i in nleft:nrt  # i = j at all times
+            for i = nleft:nrt  # i = j at all times
                 a += w[j + 1] * x[j + 1]
-                
+
                 # increment j
                 j = j + 1
             end
-            
+
             b = xs - a
 
             j = nleft
             c = 0.0
-            for i in nleft:nrt  # i = j at all times
+            for i = nleft:nrt  # i = j at all times
                 c += w[j + 1] * (x[j + 1] - a) * (x[j + 1] - a)
 
                 # increment j 
                 j = j + 1
-            end 
+            end
 
             if (sqrt(c) > 0.001 * range)
                 # points are spread out enough to compute slope
-                b = b/c
+                b = b / c
 
                 j = nleft
-                for i in nleft:nrt  # i = j at all times
-                    w[j + 1] = w[j + 1] * (1.0 + b*(x[j + 1] - a))
+                for i = nleft:nrt  # i = j at all times
+                    w[j + 1] = w[j + 1] * (1.0 + b * (x[j + 1] - a))
 
                     # increment 
                     j = j + 1
-                end 
-            end 
+                end
+            end
         end
 
         j = nleft
         ys[ys_pos + 1] = 0.0
-        for i in nleft:nrt  # i = j at all times
+        for i = nleft:nrt  # i = j at all times
             ys[ys_pos + 1] += w[j + 1] * y[j + 1]
 
             # increment j
             j = j + 1
-        end 
-    end 
-end 
+        end
+    end
+end
 
 """
 ```julia
-lowess(x, y, f = 2/3, nsteps = 3, delta = 0.01*(maximum(x) - minimum(x)))
+lowess(x, y, f = 2 / 3, nsteps = 3, delta = 0.01 * (maximum(x) - minimum(x)))
 ```
 
-Compute the smooth of a scatterplot of `y` against `x` using robust locally weighted regression. Input vectors `x` and `y` must contain either integers or floats. Parameters `f` and `delta` must be of type `T`, where `T <: AbstractFloat`. Returns a vector `ys`; `ys[i]` is the fitted value at `x[i]`. To get the smooth plot, `ys` must be plotted against `x`. 
+Compute the smooth of a scatterplot of `y` against `x` using robust locally weighted regression. Input vectors `x` and `y` must contain either integers or floats. Parameters `f` and `delta` must be of type `T`, where `T <: AbstractFloat`. Returns a vector `ys`; `ys[i]` is the fitted value at `x[i]`. To get the smooth plot, `ys` must be plotted against `x`.
 
 # Arguments
-- `x::Vector`: Abscissas of the points on the scatterplot. `x` must be ordered.
-- `y::Vector`: Ordinates of the points in the scatterplot. 
-- `f::T`: The amount of smoothing. 
-- `nsteps::Integer`: Number of iterations in the robust fit.
-- `delta::T`: A nonnegative parameter which may be used to save computations.
+
+  - `x::Vector`: Abscissas of the points on the scatterplot. `x` must be ordered.
+  - `y::Vector`: Ordinates of the points in the scatterplot.
+  - `f::T`: The amount of smoothing.
+  - `nsteps::Integer`: Number of iterations in the robust fit.
+  - `delta::T`: A nonnegative parameter which may be used to save computations.
 
 # Example
+
 ```julia
 using Lowess, Plots
 x = sort(10 .* rand(100))
@@ -142,10 +144,10 @@ plot!(x, ys)
 function lowess(
     x::AbstractVector{T},
     y::AbstractVector{T},
-    f::T = 2/3,
+    f::T = 2 / 3,
     nsteps::Integer = 3,
-    delta::T = 0.01*(maximum(x) - minimum(x)),
-) where T <: AbstractFloat
+    delta::T = 0.01 * (maximum(x) - minimum(x)),
+) where {T <: AbstractFloat}
     # defining needed variables
 
     n::Int = length(x)
@@ -179,16 +181,16 @@ function lowess(
     if (n < 2)
         ys[1] = y[1]
         return ys
-    end 
+    end
 
-    ns = max(min(floor(Int, f*n), n), 2)  # at least two, at most n points
-    for iter in 1:(nsteps + 1)  # robustness iterations
+    ns = max(min(floor(Int, f * n), n), 2)  # at least two, at most n points
+    for iter = 1:(nsteps + 1)  # robustness iterations
         nleft = 0
         nright = ns - 1
         last = -1   # index of prev estimated point
         i = 0   # index of current point
 
-        while true 
+        while true
             while (nright < n - 1)
                 # move nleft, nright to right if radius decreases
                 d1 = x[i + 1] - x[nleft + 1]
@@ -198,8 +200,8 @@ function lowess(
                     break
                 end
                 # radius will not decrease by move right
-                nleft = nleft + 1;
-	            nright = nright + 1;
+                nleft = nleft + 1
+                nright = nright + 1
             end
 
             lowest(x, y, n, x[i + 1], ys, i, nleft, nright, res, (iter > 1), rw, ok)
@@ -207,88 +209,89 @@ function lowess(
             # fitted value at x[i + 1]
             if (ok == 0)
                 ys[i + 1] = y[i + 1]
-            end 
+            end
 
             # all weights zero - copy over value (all rw==0)
             if (last < i - 1)   # skipped points -- interpolate
                 denom = x[i + 1] - x[last + 1]  # non-zero - proof?
                 j = last + 1
-                for t in (last + 1):(i - 1) # t = j at all times
+                for t = (last + 1):(i - 1) # t = j at all times
                     alpha = (x[j + 1] - x[last + 1]) / denom
                     ys[j + 1] = alpha * ys[i + 1] + (1.0 - alpha) * ys[last + 1]
 
                     # increment j
                     j = j + 1
-                end 
-            end 
+                end
+            end
 
             last = i    # last point actually estimated
             cut = x[last + 1] + delta   # x coord of close points
 
             # find close points
             i = last + 1
-            for t in (last + 1):(n - 1) # t = i at all times
+            for t = (last + 1):(n - 1) # t = i at all times
                 if (x[i + 1] > cut) # i one beyond last pt within cut
                     break
-                end 
-                
+                end
+
                 if (x[i + 1] == x[last + 1])
                     ys[i + 1] = ys[last + 1]
                     last = i
-                end 
+                end
 
                 # increment i
                 i = i + 1
             end
-            i = max(last + 1,i - 1)
-            
+            i = max(last + 1, i - 1)
+
             # back 1 point so interpolation within delta, but always go forward
             # check do while loop condition
             (last < n - 1) || break
         end
-        
+
         # residuals
-        for i in 0:(n - 1) 
+        for i = 0:(n - 1)
             res[i + 1] = y[i + 1] - ys[i + 1]
         end
-        
+
         if (iter > nsteps)  # compute robustness weights except last time
             break
         end
 
-        for i in 0:(n - 1)
+        for i = 0:(n - 1)
             rw[i + 1] = abs(res[i + 1])
         end
-        
+
         sort!(rw)
 
-        m1 = floor(1 + n/2)
+        m1 = floor(1 + n / 2)
         m2 = n - m1 + 1
         cmad = 3.0 * (rw[m1 + 1] + rw[m2 + 1])  # 6 median abs resid
         c9 = 0.999 * cmad
         c1 = 0.001 * cmad
-        for i in 0:(n - 1)
+        for i = 0:(n - 1)
             r = abs(res[i + 1])
             if (r <= c1)    # near 0, avoid underflow
                 rw[i + 1] = 1.0
             elseif (r > c9) # near 1, avoid underflow
                 rw[i + 1] = 0.0
-            else 
+            else
                 rw[i + 1] = (1.0 - (r / cmad)^2)^2
             end
-        end 
+        end
     end
-    return ys 
-end 
+    return ys
+end
 
 """
 ```julia
-lowess_model(xs, ys, f = 2/3, nsteps = 3, delta = 0.01*(maximum(xs) - minimum(xs)))
+lowess_model(xs, ys, f = 2 / 3, nsteps = 3, delta = 0.01 * (maximum(xs) - minimum(xs)))
 ```
 
 Return a lowess model which can be used to predict the ordinate corresponding to a new abscissa. Has the same arguments as `lowess`.
 
 # Example
+
 ```julia
 using Lowess, Plots
 xs = 10 .* rand(100)
@@ -301,37 +304,44 @@ us = range(extrema(xs)...; step = 0.1)
 vs = model(us)
 
 scatter(xs, ys)
-plot!(us, vs, legend=false)
+plot!(us, vs, legend = false)
 ```
 """
-function  lowess_model(xs, ys, f = 2/3, nsteps = 3, delta = 0.01*(maximum(xs) - minimum(xs)))
+function lowess_model(xs, ys, f = 2 / 3, nsteps = 3, delta = 0.01 * (maximum(xs) - minimum(xs)))
     model = lowess(xs, ys, f, nsteps, delta)
     prediction_model = interpolate(model, BSpline(Linear()))
-    prediction_model = scale(prediction_model, range(minimum(xs), stop = maximum(xs), length = length(xs)))    
+    prediction_model =
+        scale(prediction_model, range(minimum(xs), stop = maximum(xs), length = length(xs)))
     return prediction_model
 end
 
-function lowess(x::AbstractVector{Int},
+function lowess(
+    x::AbstractVector{Int},
     y::AbstractVector{T},
-    f::T = 2/3,
+    f::T = 2 / 3,
     nsteps::Integer = 3,
-    delta::T = 0.01*(maximum(x) - minimum(x))) where T <: AbstractFloat
+    delta::T = 0.01 * (maximum(x) - minimum(x))
+) where {T <: AbstractFloat}
     return lowess(Vector{Float64}(x), y, f, nsteps, delta)
 end
 
-function lowess(x::AbstractVector{T},
+function lowess(
+    x::AbstractVector{T},
     y::AbstractVector{Int},
-    f::T = 2/3,
+    f::T = 2 / 3,
     nsteps::Integer = 3,
-    delta::T = 0.01*(maximum(x) - minimum(x))) where T <: AbstractFloat
+    delta::T = 0.01 * (maximum(x) - minimum(x))
+) where {T <: AbstractFloat}
     return lowess(x, Vector{Float64}(y), f, nsteps, delta)
 end
 
-function lowess(x::AbstractVector{Int},
+function lowess(
+    x::AbstractVector{Int},
     y::AbstractVector{Int},
-    f::T = 2/3,
+    f::T = 2 / 3,
     nsteps::Integer = 3,
-    delta::T = 0.01*(maximum(x) - minimum(x))) where T <: AbstractFloat
+    delta::T = 0.01 * (maximum(x) - minimum(x))
+) where {T <: AbstractFloat}
     return lowess(Vector{Float64}(x), Vector{Float64}(y), f, nsteps, delta)
 end
 end
