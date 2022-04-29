@@ -108,3 +108,6 @@ This example plot is generated using the following code.
 
 [3] Cleveland, W. S., & Grosse, E. (1991). Computational methods for local regression. Statistics and computing, 1(1), 47-62. DOI: 10.1007/BF01890836
 
+# Support
+
+We gratefully acknowledge the JuliaLab at MIT for financial support for this project.
