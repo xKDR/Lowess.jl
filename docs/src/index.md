@@ -12,7 +12,7 @@ Pages=["index.md"]
 
 This package includes a pure Julia `lowess` function, which is an implementation
 of the LOWESS smoother (references given at the end of the documentation), along with
-a `lowess_model` function can be used to make corresponding models.
+a `lowess_model` function which can be used to make corresponding models.
 
 # Tutorial
 
