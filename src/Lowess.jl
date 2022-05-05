@@ -283,6 +283,22 @@ function lowess(
     return ys
 end
 
+function lowess(
+    x::AbstractVector{R},
+    y::AbstractVector{S},
+    f::T = 2 / 3,
+    nsteps::Integer = 3,
+    delta::T = 0.01 * (maximum(x) - minimum(x)),
+) where {R <: Real, S <: Real, T <: AbstractFloat}
+    return lowess(
+        (R <: AbstractFloat) ? x : Vector{Float64}(x),
+        (S <: AbstractFloat) ? y : Vector{Float64}(y),
+        f,
+        nsteps,
+        delta
+    )
+end
+
 """
 ```julia
 lowess_model(xs, ys, f = 2 / 3, nsteps = 3, delta = 0.01 * (maximum(xs) - minimum(xs)))
@@ -315,33 +331,4 @@ function lowess_model(xs, ys, f = 2 / 3, nsteps = 3, delta = 0.01 * (maximum(xs)
     return prediction_model
 end
 
-function lowess(
-    x::AbstractVector{Int},
-    y::AbstractVector{T},
-    f::T = 2 / 3,
-    nsteps::Integer = 3,
-    delta::T = 0.01 * (maximum(x) - minimum(x))
-) where {T <: AbstractFloat}
-    return lowess(Vector{Float64}(x), y, f, nsteps, delta)
-end
-
-function lowess(
-    x::AbstractVector{T},
-    y::AbstractVector{Int},
-    f::T = 2 / 3,
-    nsteps::Integer = 3,
-    delta::T = 0.01 * (maximum(x) - minimum(x))
-) where {T <: AbstractFloat}
-    return lowess(x, Vector{Float64}(y), f, nsteps, delta)
-end
-
-function lowess(
-    x::AbstractVector{Int},
-    y::AbstractVector{Int},
-    f::T = 2 / 3,
-    nsteps::Integer = 3,
-    delta::T = 0.01 * (maximum(x) - minimum(x))
-) where {T <: AbstractFloat}
-    return lowess(Vector{Float64}(x), Vector{Float64}(y), f, nsteps, delta)
-end
 end
