@@ -18,7 +18,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Clarity is required on the license and copyright. 
 The original FORTRAN code can be found here: https://www.netlib.org/go/lowess.f 
-The C code was found here: https://github.com/blindglobe/common-lisp-stat, but it has been deleted. 
+The C code can be found here: https://github.com/carlohamalainen/cl-lowess/blob/master/lowess.c 
 
