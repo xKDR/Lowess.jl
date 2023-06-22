@@ -51,10 +51,10 @@ vs = predict(model, us)
 end 
 ```
 ```
-BenchmarkTools.Trial: 6040 samples with 1 evaluation.
- Range (min … max):  574.949 μs …   3.726 ms  ┊ GC (min … max):  0.00% … 64.41%
- Time  (median):     693.659 μs               ┊ GC (median):     0.00%
- Time  (mean ± σ):   825.584 μs ± 515.006 μs  ┊ GC (mean ± σ):  16.85% ± 18.90%
+BenchmarkTools.Trial: 10000 samples with 1 evaluation.
+ Range (min … max):  172.354 μs …   1.783 ms  ┊ GC (min … max):  0.00% … 86.02%
+ Time  (median):     186.823 μs               ┊ GC (median):     0.00%
+ Time  (mean ± σ):   215.683 μs ± 176.942 μs  ┊ GC (mean ± σ):  11.76% ± 12.18%
 ```
 
 ```julia
