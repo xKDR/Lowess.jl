@@ -39,7 +39,7 @@ plot!(us, vs, legend=false)
 # Benchmarks
 
 ```julia
-using BenchmarkTools, using Loess, using Lowess
+using BenchmarkTools, Loess, Lowess
 xs = 10 .* rand(100)
 xs = sort(xs)
 ys = sin.(xs) .+ 0.5 * rand(100)
