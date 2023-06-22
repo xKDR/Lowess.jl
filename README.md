@@ -1,7 +1,5 @@
 # Lowess
 
-## Clarity is required on the copyright and license. 
-
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://xKDR.github.io/Lowess.jl/dev)
 ![Build Status](https://github.com/xKDR/Lowess.jl/actions/workflows/ci.yml/badge.svg)
 ![Build Status](https://github.com/xKDR/Lowess.jl/actions/workflows/documentation.yml/badge.svg)
